@@ -12,18 +12,6 @@ from datetime import datetime
 from netCDF4 import Dataset as NetCDFFile
 
 
-"""
-# Data file: ifgramStack.h5
-# Mask file: waterMask.h5
-# AOI box: (196, 111, 640, 421)
-# Threshold: None
-#       DATE12          Mean    Btemp/days      Bperp/m         Num
-20141022_20141103       0.6249        12            22.3        0
-20141022_20141127       0.6130        36           -19.3        1
-20141022_20141221       0.5326        60            55.1        2
-20141022_20150114       0.5516        84             1.8        3
-"""
-
 def main():
     args = get_args()
     intf_dir = args.intfdir
