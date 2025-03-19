@@ -98,7 +98,7 @@ def get_args():
     mess = "Loops over ifgs in intf folder, plots and you get asked if you want them or not"
 
     example = """EXAMPLE:
-       select_ifgs_gmtsar.py -d path/to/intf         """
+       select_ifgs_gmtsar.py -d path/to/intf   -p project/dir"""
 
     parser = argparse.ArgumentParser(description=mess, epilog=example,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
