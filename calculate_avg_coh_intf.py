@@ -67,7 +67,7 @@ def main():
     
 
 def get_args():
-    mess = "calculates average of coherence (corr) given range"
+    mess = "calculates average of coherence (corr) given window"
 
     example = """EXAMPLE:
        calculate_avg_coh_intf.py -d directory/path -r 300/2000/600/9000

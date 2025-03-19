@@ -67,7 +67,7 @@ def get_args():
 
     # Required arguments
     parser.add_argument('-d', '--directory', dest='directory', required=True, type=Path, help='Path to directory with SLCs to cut')
-    parser.add_argument('-s', '--savedir', dest='savedir', required=True, type=Path, help='Path to directory to save cut SLC')
+    parser.add_argument('-s', '--savedir', dest='savedir', required=True, type=Path, help='Path to directory to save cut SLCs')
     parser.add_argument('-c', '--cut', dest='cutrange', required=True, nargs=4, type=str, help='Cut range: xmin xmax ymin ymax')
     return parser.parse_args()
 

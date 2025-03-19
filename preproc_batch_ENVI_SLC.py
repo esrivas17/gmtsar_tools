@@ -58,7 +58,7 @@ def main():
 
 
 def get_args():
-    mess = "Preprocess raw ENVI-ERS files for GMTSAR"
+    mess = "Preprocess raw ENVI-ERS files for GMTSAR. This is missing the refocusing needed for ERS, so you better dont use it"
 
     example = """EXAMPLE:
        preproc_batch_ENVI_SLC.py -r path/to/rawfiles --rawmaster path/to/rawfile

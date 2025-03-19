@@ -49,7 +49,7 @@ def main():
 
 
 def get_args():
-    mess = "checks dimensions of SLC based on PRM file"
+    mess = "checks dimensions of SLC based on PRM file in a directory. It needs PRM and SLC files"
 
     example = """EXAMPLE:
        check_dims_in_dir.py -p path/to/project 

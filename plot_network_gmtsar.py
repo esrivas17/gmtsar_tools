@@ -134,7 +134,8 @@ def main():
 
 
 def get_args():
-    mess = "Plot selected pairs based on a baseline table with matplotlib"
+    mess = "Plot selected pairs based on a baseline table with matplotlib." \
+    "There is an option to include a previous intf.in and add it on top of your new network of ifgs"
 
     example = """EXAMPLE:
        plot_baseline_gmtsar.py -f path/to/baseline_table.dat

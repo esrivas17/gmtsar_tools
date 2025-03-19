@@ -76,10 +76,10 @@ def check_dimensions(slcfile, prmfile):
 
 
 def get_args():
-    mess = "checks dimensions of SLC based on PRM file"
+    mess = "checks dimensions of SLC based on PRM file. It takes dimensions from master PRM and compares dimensions of coregistered SLCs"
 
     example = """EXAMPLE:
-       check_dimensions_coreg_SLCs.py -p path/to/project 
+       check_dimensions_coreg_SLCs.py -p path/to/project -m master_Stem --slcdir path/to/SLC
         """
 
     parser = argparse.ArgumentParser(description=mess, epilog=example,

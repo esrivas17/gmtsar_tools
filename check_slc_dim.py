@@ -38,7 +38,7 @@ def main():
 
 
 def get_args():
-    mess = "checks dimensions of SLC based on PRM file"
+    mess = "Quick check of SLC dimensions based on PRM file"
 
     example = """EXAMPLE:
        check_SLC_dim.py -s path/to/slc -p path/to/prm 
