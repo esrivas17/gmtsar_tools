@@ -100,7 +100,7 @@ def main():
     if slcdir:
         dates = [orb_dict[orb][14:22]for orb in sat_orb]
 
-    # Pairs is a list of list containing two points
+    # Making collection from a list of list containing two points
     collection = LineCollection(pairs, colors='orangered', linewidths=0.6, alpha=0.7, linestyle='solid', label='network')
     xticks = np.arange(int(np.floor(xmin)), int(np.ceil(xmax)+1), 0.5)
     yticks = np.arange(ymin - (ymin%50), ymax + (100 - ymax%50), 50)
