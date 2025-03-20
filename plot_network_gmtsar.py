@@ -92,7 +92,7 @@ def main():
         with open(outfile, 'w') as f:
             print(f'Writing {outfile}...')
             for intf in intf_in:
-                if exclude_ifgs:
+                if exclude_intf:
                     if intf not in exclude_ifgs:
                         f.write(f'{intf}\n')
                 else:
