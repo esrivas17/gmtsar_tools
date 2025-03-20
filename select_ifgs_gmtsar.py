@@ -37,7 +37,7 @@ def main():
     else:
         reject_intf.mkdir()
 
-    for intf in intfdir.iterdir():
+    for intf in sorted(intfdir.iterdir()):
         if intf.is_dir() and "_" in intf.name:
             phase = intf.joinpath("phase.grd")
             corr = intf.joinpath("corr.grd")
