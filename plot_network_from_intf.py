@@ -22,7 +22,6 @@ def main():
 
     yearfrac = data['aligned_time'].to_numpy()
     bperp = data.Bperp.to_numpy()
-    sat_orb = data.sat_orb.to_numpy()
     xmin, xmax = yearfrac.min(), yearfrac.max()
     ymin, ymax = bperp.min(), bperp.max()
 
