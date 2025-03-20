@@ -23,6 +23,7 @@ def main():
     enddate = str2date(args.enddate) if args.enddate else datetime.today().date()
     slcdir = args.slcdir
     current_network = args.current_network
+    exclude_intf = args.exclude_intf
     outfile = args.outfile
 
     if slcdir:
@@ -80,13 +81,22 @@ def main():
                         else:
                             intf_in.append(stem_pair)
                     pairs.append([p1,p2])
+    
+    # Excluding intf
+    if exclude_intf:
+        if exclude_intf.exists():
+            exclude_ifgs = ifgs_to_exclude(exclude_intf)
 
     # writing intf.in
     if intf_in:
         with open(outfile, 'w') as f:
             print(f'Writing {outfile}...')
             for intf in intf_in:
-                f.write(f'{intf}\n')
+                if exclude_ifgs:
+                    if intf not in exclude_ifgs:
+                        f.write(f'{intf}\n')
+                else:
+                    f.write(f'{intf}\n')
 
         print(f'{outfile} written\n')
 
@@ -127,6 +137,15 @@ def main():
     plt.show()
 
 
+def ifgs_to_exclude(intf_file) -> list:
+    ifgs_exclude = list()
+    with open(intf_file, 'r') as ifgs:
+            print(f'Excluding interferograms from: {intf_file}')
+            for pair in ifgs:
+                ifgs_exclude.append(pair)
+    return ifgs_exclude
+
+
 def get_args():
     mess = "Plot selected pairs based on a baseline table with matplotlib." \
     "There is an option to include a previous intf.in and add it on top of your new network of ifgs"
@@ -148,7 +167,8 @@ def get_args():
     parser.add_argument('--start', dest='startdate', type=str, help='Start date to create pairs. format: YYYYMMDD')
     parser.add_argument('--end', dest='enddate', type=str, help='End date to create pairs. format: YYYYMMDD' )
     parser.add_argument('--slc', dest='slcdir', type=str, help='Directory of coregistered SLC, optional for writing a intf.in')
-    parser.add_argument('--intf', dest='current_network', type=Path, help='Path to intf.in if you have one')
+    parser.add_argument('--intf', dest='current_network', type=Path, help='Path to intf.in if you have one. It will be plot on top of your network')
+    parser.add_argument('--exclude_intf', dest='exclude_intf', type=Path, help='It will take ifgs from this file to prevent writing them in the new outfile intf.in')
     parser.add_argument('--outfile', type=str, dest='outfile', default='ifgs.in', help='Name for output file with intfs, slcdir needs to be define. Default: ifgs.in')
     return parser.parse_args()
 
