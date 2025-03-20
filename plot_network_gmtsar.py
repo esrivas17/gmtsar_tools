@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 from matplotlib.collections import LineCollection
 from datetime import datetime, timedelta
-from functions import fracyear2yyyymmdd
+from functions import read_baseline_table
 import glob
 import pdb
 
@@ -27,20 +27,10 @@ def main():
         slcs = glob.glob(f'{slcdir}/*.SLC')
         orb_dict = {slc.split("_")[-2]:Path(slc).stem for slc in slcs}
 
-    data = pd.read_csv(baselinetab, sep=" ", header=None, dtype={0:str})
-    rows, cols = data.shape
-    print(f"Data with {rows} rows")
-    if cols == 5:
-        data.columns = ["sat_orb", "aligned_time", "aligned_days", "Bpl", "Bperp"]
-    elif cols == 7:
-        data.columns = ["sat_orb", "aligned_time", "aligned_days", "Bpl", "Bperp", "xshift", "yshift"]
-    else:
-        raise Exception(f"Unexpected number of columns: {data.columns}")
+    data = read_baseline_table(baselinetab)
     
     fig, ax = plt.subplots(figsize=(12,8))
 
-    data['date_dt'] = data.aligned_time.apply(fracyear2yyyymmdd)
-    data['aligned_time'] = data.aligned_time.apply(lambda x: (x%1000)/365.25 + int(x/1000))
     yearfrac = data['aligned_time'].to_numpy()
     bperp = data.Bperp.to_numpy()
     sat_orb = data.sat_orb.to_numpy()
@@ -138,7 +128,7 @@ def get_args():
     "There is an option to include a previous intf.in and add it on top of your new network of ifgs"
 
     example = """EXAMPLE:
-       plot_baseline_gmtsar.py -f path/to/baseline_table.dat
+       plot_network_gmtsar.py -f path/to/baseline_table.dat
         """
 
     parser = argparse.ArgumentParser(description=mess, epilog=example,

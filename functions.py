@@ -2,7 +2,9 @@ import re
 import subprocess
 import datetime as dt
 from datetime import datetime, timedelta
+import pandas as pd
 import numpy as np
+from pathlib import Path
 import pdb
 
 
@@ -68,3 +70,17 @@ def fracyear2yyyymmdd(fracyear: float):
     datet = datetime(year, 1, 1) + timedelta(days=day_year - 1)
     return datet.date()
 
+def read_baseline_table(baselinetab: Path):
+    data = pd.read_csv(baselinetab, sep=" ", header=None, dtype={0:str})
+    rows, cols = data.shape
+    print(f"Data with {rows} rows")
+    if cols == 5:
+        data.columns = ["sat_orb", "aligned_time", "aligned_days", "Bpl", "Bperp"]
+    elif cols == 7:
+        data.columns = ["sat_orb", "aligned_time", "aligned_days", "Bpl", "Bperp", "xshift", "yshift"]
+    else:
+        raise Exception(f"Unexpected number of columns: {data.columns}")
+    
+    data['date_dt'] = data.aligned_time.apply(fracyear2yyyymmdd)
+    data['aligned_time'] = data.aligned_time.apply(lambda x: (x%1000)/365.25 + int(x/1000))
+    return data
