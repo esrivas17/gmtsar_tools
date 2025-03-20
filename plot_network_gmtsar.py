@@ -168,7 +168,7 @@ def get_args():
     parser.add_argument('--end', dest='enddate', type=str, help='End date to create pairs. format: YYYYMMDD' )
     parser.add_argument('--slc', dest='slcdir', type=str, help='Directory of coregistered SLC, optional for writing a intf.in')
     parser.add_argument('--intf', dest='current_network', type=Path, help='Path to intf.in if you have one. It will be plot on top of your network')
-    parser.add_argument('--exclude_intf', dest='exclude_intf', type=Path, help='It will take ifgs from this file to prevent writing them in the new outfile intf.in')
+    parser.add_argument('--exclude_intf', dest='exclude_intf', default=None, type=Path, help='It will take ifgs from this file to prevent writing them in the new outfile intf.in')
     parser.add_argument('--outfile', type=str, dest='outfile', default='ifgs.in', help='Name for output file with intfs, slcdir needs to be define. Default: ifgs.in')
     return parser.parse_args()
 
