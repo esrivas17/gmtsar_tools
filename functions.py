@@ -83,4 +83,5 @@ def read_baseline_table(baselinetab: Path):
     
     data['date_dt'] = data.aligned_time.apply(fracyear2yyyymmdd)
     data['aligned_time'] = data.aligned_time.apply(lambda x: (x%1000)/365.25 + int(x/1000))
-    return data
+    dfsorted = data.sort_values(by='date_dt')
+    return dfsorted
