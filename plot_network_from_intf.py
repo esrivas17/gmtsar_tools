@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 from matplotlib.collections import LineCollection
-from datetime import datetime, timedelta
+from datetime import datetime
 from functions import read_baseline_table
 import glob
 import pdb
