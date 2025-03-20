@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 from matplotlib.collections import LineCollection
-from datetime import datetime
+from datetime import datetime, date
 from functions import read_baseline_table, str2date
 import glob
 import pdb
@@ -19,7 +19,7 @@ def main():
     maxtbase = args.maxtempbase
     minpbase = args.minpbase
     maxpbase = args.maxpbase
-    startdate = str2date(args.startdate) if args.startdate else datetime.date(1990,1,1)
+    startdate = str2date(args.startdate) if args.startdate else date(1990,1,1)
     enddate = str2date(args.enddate) if args.enddate else datetime.today().date()
     slcdir = args.slcdir
     current_network = args.current_network
