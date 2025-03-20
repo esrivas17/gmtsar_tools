@@ -142,7 +142,7 @@ def ifgs_to_exclude(intf_file) -> list:
     with open(intf_file, 'r') as ifgs:
             print(f'Excluding interferograms from: {intf_file}')
             for pair in ifgs:
-                ifgs_exclude.append(pair)
+                ifgs_exclude.append(pair.strip())
     return ifgs_exclude
 
 
