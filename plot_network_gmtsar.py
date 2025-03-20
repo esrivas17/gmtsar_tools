@@ -6,8 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import combinations
 from matplotlib.collections import LineCollection
-from datetime import datetime, timedelta
-from functions import read_baseline_table
+from datetime import datetime
+from functions import read_baseline_table, str2date
 import glob
 import pdb
 
@@ -19,6 +19,8 @@ def main():
     maxtbase = args.maxtempbase
     minpbase = args.minpbase
     maxpbase = args.maxpbase
+    startdate = str2date(args.startdate) if args.startdate else datetime.date(1990,1,1)
+    enddate = str2date(args.enddate) if args.enddate else datetime.today().date()
     slcdir = args.slcdir
     current_network = args.current_network
     outfile = args.outfile
@@ -59,23 +61,25 @@ def main():
     pairs = list()
     
     # Making network
-    for im1, im2 in combinations(data.sat_orb.to_list(), 2):
+    for im1, im2 in sorted(combinations(data.sat_orb.to_list(), 2)):
         row_im1 = data.loc[data.sat_orb == im1]
         row_im2 = data.loc[data.sat_orb == im2]
         bperp1, bperp2 = row_im1['Bperp'].values[0], row_im2['Bperp'].values[0]
         t1, t2 = row_im1['aligned_days'].values[0], row_im2['aligned_days'].values[0]
-        if t1 < t2 and t2 - t1 < maxtbase and t2 - t1 >= mintbase:
-            if abs(bperp2 - bperp1) < maxpbase and abs(bperp2 - bperp1) >= minpbase:
-                p1 = [row_im1['aligned_time'].values[0], bperp1]
-                p2 = [row_im2['aligned_time'].values[0], bperp2]
-                if slcdir:
-                    stem_pair = f'{orb_dict[im1]}:{orb_dict[im2]}'
-                    if stem_pair in current_ifgs:
-                        print(f'Pair {stem_pair} in {current_ifgs}, skip')
-                        continue
-                    else:
-                        intf_in.append(stem_pair)
-                pairs.append([p1,p2])
+        dt1 = row_im1['date_dt'].values[0]
+        if dt1 > startdate and dt1 <= enddate:
+            if t1 < t2 and t2 - t1 < maxtbase and t2 - t1 >= mintbase:
+                if abs(bperp2 - bperp1) < maxpbase and abs(bperp2 - bperp1) >= minpbase:
+                    p1 = [row_im1['aligned_time'].values[0], bperp1]
+                    p2 = [row_im2['aligned_time'].values[0], bperp2]
+                    if slcdir:
+                        stem_pair = f'{orb_dict[im1]}:{orb_dict[im2]}'
+                        if stem_pair in current_ifgs:
+                            print(f'Pair {stem_pair} in {current_ifgs}, skip')
+                            continue
+                        else:
+                            intf_in.append(stem_pair)
+                    pairs.append([p1,p2])
 
     # writing intf.in
     if intf_in:
@@ -141,6 +145,8 @@ def get_args():
     parser.add_argument('--maxt', dest='maxtempbase', type=int, required=True, help='Maximum temporal baseline')
     parser.add_argument('--minb',dest='minpbase', type=int,  default=0, help='Minimum perpendicular baseline')
     parser.add_argument('--maxb', dest='maxpbase', type=int, required=True, help='Maximum perpendicular baseline')
+    parser.add_argument('--start', dest='startdate', type=str, help='Start date to create pairs. format: YYYYMMDD')
+    parser.add_argument('--end', dest='enddate', type=str, help='End date to create pairs. format: YYYYMMDD' )
     parser.add_argument('--slc', dest='slcdir', type=str, help='Directory of coregistered SLC, optional for writing a intf.in')
     parser.add_argument('--intf', dest='current_network', type=Path, help='Path to intf.in if you have one')
     parser.add_argument('--outfile', type=str, dest='outfile', default='ifgs.in', help='Name for output file with intfs, slcdir needs to be define. Default: ifgs.in')
