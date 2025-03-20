@@ -32,7 +32,7 @@ def main():
         print(f'Intf: {intf}')
         if intf.is_dir() and "_" in intf.name and len(intf.name.split("_")) == 2:
             prms = glob.glob(f'{intf}/*PRM')
-            prms.sort(key=lambda x: datetime.strptime(x[14:22], "%Y%m%d").date())
+            prms.sort(key=lambda x: datetime.strptime(x.split("/")[-1][14:22], "%Y%m%d").date())
             if len(prms) !=2:
                 print(f'WARNING: PRM files in: {intf} is different from two\nPRMs: {prms}')
                 continue
