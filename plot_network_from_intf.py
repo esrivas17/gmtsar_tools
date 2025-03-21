@@ -16,6 +16,7 @@ def main():
     args = get_args()
     baseline_table = args.baseline_table
     intf_dir = args.intf_dir
+    intf_out = args.intf_out
 
     data = read_baseline_table(baseline_table)
     fig, ax = plt.subplots(figsize=(12,8))
@@ -27,6 +28,7 @@ def main():
     ymin, ymax = bperp.min(), bperp.max()
 
     pairs = list()
+    stem_pairs_list = list()
     i = 0
     for intf in intf_dir.iterdir():
         print(f'Intf: {intf}')
@@ -45,6 +47,8 @@ def main():
             p1 = [row_master['aligned_time'].values[0], bperp1]
             p2 = [row_slave['aligned_time'].values[0], bperp2]
             pairs.append([p1,p2])
+            stem_pair = f'{masterPRM.split("/")[-1].split(".")[0]}:{slavePRM.split("/")[-1].split(".")[0]}'
+            stem_pairs_list.append(stem_pair)
             i += 1
 
     collection = LineCollection(pairs, colors='darkorange', linewidths=0.6, alpha=0.7, linestyle='solid', label='network')
@@ -63,6 +67,15 @@ def main():
     ax.set_xticks(xticks)
     plt.show()
 
+    # writing intf_out
+    if intf_out:
+         with open(intf_out, 'w') as f:
+            print(f'Writing {intf_out}...')
+            for intf in stem_pairs_list:
+                f.write(f'{intf}\n')
+
+    print(f'{intf_out} written\n')
+
 
 
 def get_args():
@@ -78,6 +91,7 @@ def get_args():
     # Positional arguments
     parser.add_argument('baseline_table', type=Path, help='Path to baseline_table.dat')
     parser.add_argument('intf_dir', type=Path, help='Path to intf directory')
+    parser.add_argument('--intf', dest='intf_out', default=None, help='Name of optionally writing intf_out.in')
     return parser.parse_args()
 
 
