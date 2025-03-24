@@ -4,7 +4,7 @@ if ($#argv < 4) then
    echo ""
    echo "Usage: inc_azi_angle.csh trans.dat topo_ra.grd master.PRM corr_ll.grd"
    echo ""
-   echo " Returns incidence_angle and azimuth, this in preparation for GMTSAR+Mintpy processing"
+   echo " Returns incidence_angle and azimuth and topo_ll_resample, this in preparation for GMTSAR+Mintpy processing"
    echo " put a geocoded product from intf, it can be corr or phase ll"
    echo ""
    echo "Example: inc_azi_angle.csh trans.dat topo_ra.grd master.PRM ../intf/corr_ll.grd "
@@ -51,6 +51,7 @@ set yinc = `gmt grdinfo grid_ll.grd -C | awk '{print $9}'`
 
 gmt grdsample inc.grd -Gincidence.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1
 gmt grdsample azi.grd -Gazimuth.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1
+gmt grdsample $topoll -Gtopo_ll_resample.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1
 
 echo "Done"
 
