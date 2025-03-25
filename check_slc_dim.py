@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from pathlib import Path
-from functions import grep
+from utils import grep
 import numpy as np
 import pdb
 

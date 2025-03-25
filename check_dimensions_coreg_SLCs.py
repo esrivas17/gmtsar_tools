@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 import glob
-from functions import grep
+from utils import grep
 import numpy as np
 import pdb
 

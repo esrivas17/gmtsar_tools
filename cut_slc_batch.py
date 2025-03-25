@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 import glob
-from functions import grep, run_command
+from utils import grep, run_command
 import os
 import pdb
 

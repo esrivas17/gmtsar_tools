@@ -4,10 +4,9 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from itertools import combinations
 from matplotlib.collections import LineCollection
 from datetime import datetime
-from functions import read_baseline_table
+from utils import read_baseline_table
 import glob
 import pdb
 
