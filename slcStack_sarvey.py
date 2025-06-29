@@ -2,9 +2,9 @@
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd
+from utils import grep, fracyear2yyyymmdd, try_command
 import numpy as np
-import matplotlib.pyplot as plt
+import os
 import pdb
 
 
@@ -13,9 +13,9 @@ def main():
     slcpath = args.slcpath
     topopath = args.topopath
 
-    slcs = sorted(glob.glob(f'str({slcpath})/*.SLC'))
-    leds = sorted(glob.glob(f'str({slcpath})/*.LED'))
-    prms = sorted(glob.glob(f'str({slcpath})/*.PRM'))
+    slcs = sorted(glob.glob(f'{str(slcpath)}/*.SLC'))
+    leds = sorted(glob.glob(f'{str(slcpath)}/*.LED'))
+    prms = sorted(glob.glob(f'{str(slcpath)}/*.PRM'))
 
     if len(slcs) != len(leds) != len(prms):
         raise Exception(f"Inconsistent number of SLCs: {len(slcs)}, LEDs: {len(leds)}, and PRMs: {len(prms)} files")
@@ -26,7 +26,8 @@ def main():
     # Making the oldest date as reference
     prmReference = sorted([str(x) for x in slcpath.iterdir() if x.suffix == '.PRM'], key=lambda x: float(grep(x, 'SC_clock_start')))[0]
     prmRefstartstr = fracyear2yyyymmdd(float(grep(prmReference, 'SC_clock_start'))).strftime("%Y%m%d")
-
+    slcReference = prmReference.split(".")[0]+".SLC"
+    ledReference = prmReference.split(".")[0]+".LED"
     # create intf directory
     ifgsPath = Path("smaster_ifgs")
     if not ifgsPath.exists():
@@ -51,6 +52,17 @@ def main():
         ifgPath.resolve().joinpath(slc.split("/")[-1]).symlink_to(slc)
         ifgPath.resolve().joinpath(led.split("/")[-1]).symlink_to(led)
         ifgPath.resolve().joinpath(toporapath.name).symlink_to(toporapath.as_posix())
+        ifgPath.resolve().joinpath(prmReference.split("/")[-1]).symlink_to(prmReference)
+        ifgPath.resolve().joinpath(slcReference.split("/")[-1]).symlink_to(slcReference)
+        ifgPath.resolve().joinpath(ledReference.split("/")[-1]).symlink_to(ledReference)
+
+        current_cwd = Path().cwd()
+        os.chdir(ifgPath)
+        cmd_lst = ["intf.csh", prmReference.split("/")[-1], prm.split("/")[-1], "-topo", str(toporapath)]
+        if not try_command(cmd_lst):
+            raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
+        os.chdir(str(current_cwd))
+
            
             
 
