@@ -85,3 +85,26 @@ def read_baseline_table(baselinetab: Path):
     data['aligned_time'] = data.aligned_time.apply(lambda x: (x%1000)/365.25 + int(x/1000))
     dfsorted = data.sort_values(by='date_dt')
     return dfsorted
+
+def getSlcData(slcPath, prmPath):
+    #Get rows and columns
+    nlines = grep(prmPath, 'num_lines')
+    rgbins = grep(prmPath, 'num_rng_bins')
+    # read slc and reshape
+    slc_data = np.fromfile(slcPath, dtype=np.int16)
+    slc_data = slc_data.astype(np.float32).view(np.complex64)
+    try:
+        slc_data = slc_data.reshape((nlines,rgbins))
+    except ValueError as e:
+        print(f'Problem reshaping slc. PRM file: {prmPath}\nException: {e}')
+        return -1
+    else:
+        return slc_data
+    
+def readRealImgIfg(realPath, imPath):
+    from netCDF4 import Dataset as NetCDFFile
+    ncR = NetCDFFile(realPath)
+    ncI = NetCDFFile(imPath)
+    real = ncR.variables['z'][:].data
+    imag = ncI.variables['z'][:].data
+    return real+1j*imag

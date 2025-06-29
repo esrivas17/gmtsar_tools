@@ -2,9 +2,11 @@
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd, try_command
+from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readRealImgIfg
 import numpy as np
 import os
+import h5py as h5
+import subprocess
 import pdb
 
 
@@ -28,13 +30,22 @@ def main():
     prmRefstartstr = fracyear2yyyymmdd(float(grep(prmReference, 'SC_clock_start'))).strftime("%Y%m%d")
     slcReference = prmReference.split(".")[0]+".SLC"
     ledReference = prmReference.split(".")[0]+".LED"
+    slcRef = getSlcData(slcReference, prmReference)
+
     # create intf directory
     ifgsPath = Path("smaster_ifgs")
     if not ifgsPath.exists():
         ifgsPath.mkdir()
 
+    # Lists of data
+    slc_corrected = [slcRef]
+    bperps = [0]
+    dates = [prmRefstartstr]
+
+
     for prm, slc, led in zip(prms, slcs, leds):
-        if prm == prmReference:
+        current_cwd = Path().cwd()
+        if prm == prmReference:            
             continue
 
         sc_clock_start = float(grep(prm, 'SC_clock_start'))
@@ -56,23 +67,57 @@ def main():
         ifgPath.resolve().joinpath(slcReference.split("/")[-1]).symlink_to(slcReference)
         ifgPath.resolve().joinpath(ledReference.split("/")[-1]).symlink_to(ledReference)
 
-        current_cwd = Path().cwd()
         os.chdir(ifgPath)
         cmd_lst = ["intf.csh", prmReference.split("/")[-1], prm.split("/")[-1], "-topo", str(toporapath)]
         if not try_command(cmd_lst):
             raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
         os.chdir(str(current_cwd))
 
-           
-            
+        # making interferogram
+        slcSec = getSlcData(slc, prm)
+        ifg = slcRef * np.conjugate(slcSec)
 
-                                                                  
-    # list of slcs
-    
-    # reads prm and makes reasonable names for intf folders
-    # creates folders and symlinks for prms, leds, slcs and topo_ra.grd
-    # loop over each folder and run a intf.csh script 
-    # or give full path to script and cd and run and go back
+        # Real and Imag parts of ifg
+        realPath = ifgPath.joinpath("real.grd")
+        imagPath = ifgPath.joinpath("imag.grd")
+
+        ifgNoDrho = readRealImgIfg(realPath, imagPath)
+
+        drho = ifg * np.conjugate(ifgNoDrho)
+        slcNoDrho = slcSec * np.conjugate(drho)
+        slc_corrected.append(slcNoDrho)
+
+        # Perp baseline
+        sat_output = subprocess.run(['SAT_baseline', prmReference, prm], capture_output=True, text=True)
+        bperp_grep = subprocess.run(['grep', 'B_perpendicular'], input=sat_output.stdout, capture_output=True, text=True)
+        bperps.append(float(bperp_grep.stdout.split("=")[-1].strip()))
+
+        # dates
+        dates.append(startstr)
+
+
+    # slc stack
+    slcStack = np.stack(slc_corrected)
+    bperpStack = np.array(bperps, dtype=np.float32)
+    datesStack = np.array(dates, dtype=np.bytes_)
+
+    # writing to h5file
+    print(f'Writing SLC stack')
+    with h5.File('slcStack.h5', 'w') as dst:
+        # slc
+        print(f'Writing SLCs...')
+        dst.create_dataset("slc", data=slcStack, dtype=slcStack.dtype, shape=slcStack.shape, chunks=True)
+        # Bperp
+        dst.create_dataset("bperp", data=bperpStack, dtype=bperpStack.dtype, shape=bperpStack.shape)       
+        # date
+        dst.create_dataset("date", data=datesStack)
+        #for key in metadata.keys():
+         #   dst.attrs[key] = metadata[key]
+
+    print(f'slcStack.h5 written.')
+
+    # removing single master intfs
+    ifgPath.unlink()
 
 
 def get_args():
