@@ -68,7 +68,6 @@ def get_args():
 
     example = """EXAMPLE:
        slcStack_sarvey.py -s path/to/coregistered_slc -t path/to/topo
-       slcStack_sarvey.py -f path/to/file --savedir /path/to/save 
         """
 
     parser = argparse.ArgumentParser(description=mess, epilog=example,
