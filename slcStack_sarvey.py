@@ -88,7 +88,7 @@ def main():
         ifgNoDrho = real+1j*imag
 
         drho = ifg * np.conjugate(ifgNoDrho)
-        slcNoDrho = slcSec * np.conjugate(drho)
+        slcNoDrho = slcSec * np.conjugate(drho)/np.abs(drho) # if I dont add this I am scaling the result
         slc_corrected.append(slcNoDrho)
 
         # Perp baseline
