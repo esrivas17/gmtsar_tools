@@ -126,7 +126,7 @@ def readOldGMTFormat(grd, offset=892):
 
     # decoding string parameters
     for parm in strparms:
-        if parm in headerDict.keys() and parm in headerDict.keys():
+        if parm in headerDict.keys():
             headerDict[parm] = headerDict[parm].decode('ascii').strip('\x00')
 
     # Getting and reshaping data
