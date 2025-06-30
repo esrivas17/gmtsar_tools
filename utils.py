@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import struct
 import pdb
 
 
@@ -100,11 +101,36 @@ def getSlcData(slcPath, prmPath):
         return -1
     else:
         return slc_data
+                        
+def readOldGMTFormat(grd, offset=892):
+    """
+    Function to read real.grd and imag.grd that have the old style native grid format with an offset of 892
+    and format defined in:
+    https://docs.generic-mapping-tools.org/6.2/cookbook/file-formats.html
+    """
+    parms = ["n_columns", "n_rows", "registration", "x_min", "x_max", "y_min", "y_max", "z_min", "z_max", 
+             "x_inc", "y_inc", "z_scale_factor", "z_add_offset", "x_units", "y_units", "z_units", "title", "command", "remark"]
     
-def readRealImgIfg(realPath, imPath):
-    from netCDF4 import Dataset as NetCDFFile
-    ncR = NetCDFFile(realPath)
-    ncI = NetCDFFile(imPath)
-    real = ncR.variables['z'][:].data
-    imag = ncI.variables['z'][:].data
-    return real+1j*imag
+    strparms = ["x_units", "y_units", "z_units", "title", "command", "remark"]]
+
+    fmt = '=3i 10d 80s 80s 80s 80s 320s 160s'
+    if struct.calcsize(fmt) != offset:
+        raise Exception(f"Header offset seems to be different from defined structure")
+    
+    # Headers
+    with open(grd, "rb") as f:
+        headerBytes = f.read(offset)
+
+    headerTup = struct.unpack(fmt, headerBytes)
+    headerDict = {k:v for k,v in zip(parms,headerTup)}
+
+    # decoding string parameters
+    for parm in strparms:
+        if parm in headerDict.keys() and parm in headerDict.keys():
+            headerDict[parm] = headerDict[parm].decode('ascii').strip('\x00')
+
+    # Getting and reshaping data
+    data = np.fromfile(grd, dtype=np.float32, offset=offset)
+    data = data.reshape((headerDict['n_rows'], headerDict['n_columns']))
+
+    return data, headerDict

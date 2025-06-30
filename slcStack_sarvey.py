@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readRealImgIfg
+from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readRealImgIfg, readOldGMTFormat
 import numpy as np
 import os
 import h5py as h5
@@ -81,7 +81,10 @@ def main():
         realPath = ifgPath.joinpath("real.grd")
         imagPath = ifgPath.joinpath("imag.grd")
 
-        ifgNoDrho = readRealImgIfg(realPath, imagPath)
+        # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
+        real, _ =  readOldGMTFormat(realPath)
+        imag, _ =  readOldGMTFormat(imagPath)
+        ifgNoDrho = real+1j*imag
 
         drho = ifg * np.conjugate(ifgNoDrho)
         slcNoDrho = slcSec * np.conjugate(drho)
