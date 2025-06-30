@@ -3,7 +3,7 @@ import os
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readRealImgIfg, readOldGMTFormat
+from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readOldGMTFormat
 import numpy as np
 import shutil
 import h5py as h5

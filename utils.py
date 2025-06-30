@@ -111,7 +111,7 @@ def readOldGMTFormat(grd, offset=892):
     parms = ["n_columns", "n_rows", "registration", "x_min", "x_max", "y_min", "y_max", "z_min", "z_max", 
              "x_inc", "y_inc", "z_scale_factor", "z_add_offset", "x_units", "y_units", "z_units", "title", "command", "remark"]
     
-    strparms = ["x_units", "y_units", "z_units", "title", "command", "remark"]]
+    strparms = ["x_units", "y_units", "z_units", "title", "command", "remark"]
 
     fmt = '=3i 10d 80s 80s 80s 80s 320s 160s'
     if struct.calcsize(fmt) != offset:
