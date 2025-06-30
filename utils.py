@@ -89,8 +89,8 @@ def read_baseline_table(baselinetab: Path):
 
 def getSlcData(slcPath, prmPath):
     #Get rows and columns
-    nlines = grep(prmPath, 'num_lines')
-    rgbins = grep(prmPath, 'num_rng_bins')
+    nlines = int(grep(prmPath, 'num_lines'))
+    rgbins = int(grep(prmPath, 'num_rng_bins'))
     # read slc and reshape
     slc_data = np.fromfile(slcPath, dtype=np.int16)
     slc_data = slc_data.astype(np.float32).view(np.complex64)
