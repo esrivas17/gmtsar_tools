@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import os
 import argparse
 from pathlib import Path
 import glob
 from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readRealImgIfg, readOldGMTFormat
 import numpy as np
-import os
+import shutil
 import h5py as h5
 import subprocess
 import pdb
@@ -120,7 +121,9 @@ def main():
     print(f'slcStack.h5 written.')
 
     # removing single master intfs
-    ifgPath.unlink()
+    print("Removing intf directory...")
+    if ifgPath.is_dir():
+        shutil.rmtree(ifgPath)
 
 
 def get_args():
