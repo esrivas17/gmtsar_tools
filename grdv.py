@@ -22,6 +22,9 @@ def main(*, filepath: Path, cmap: str, minmaxv: list, figsize: tuple, aspect: Un
     if not filepath.exists():
         raise Exception(f'This file does not exist: {filepath}')
     
+    if not title:
+        title = filepath.name()
+
     # open grd file
     nc = NetCDFFile(filepath.as_posix())
     if llflag:
