@@ -109,4 +109,6 @@ rm l*_ra.grd
 rm llt.xyz
 rm R2.grd lookAngle.grd rangeAngle.grd
 rm ll*
+rm topo.lltn
+rm look*.grd
 cd ..
