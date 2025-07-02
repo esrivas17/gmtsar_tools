@@ -73,25 +73,26 @@ echo "INTERPOLATION OF LOOK VECTORS ENU"
 echo ""
 # Making interpolation with surface based on data from previous step 
 # This step can take a bit of a while, depending of the extension of your data
-gmt grd2xyz lE_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookE.grd -V
-gmt grd2xyz lN_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookN.grd -V
-gmt grd2xyz lU_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookU.grd -V
+gmt grd2xyz lE_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookE.grd -r -V
+gmt grd2xyz lN_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookN.grd -r -V
+gmt grd2xyz lU_ra.grd|gmt surface -I1/1 -R$x0/$x1/$y0/$y1 -T.5 -GlookU.grd -r -V
 
 echo ""
 echo "CALCULATING INCIDENCE AND AZIMUTH ANGLES"
 echo ""
 # Incidence angle
-gmt grdmath lookE.grd lookN.grd HYPOT lookU.grd ATAN2 R2D = incdeg.grd
+gmt grdmath lookE.grd lookN.grd HYPOT lookU.grd ATAN2 R2D = incidence.grd # In degrees
 gmt grdmath lookE.grd lookN.grd HYPOT lookU.grd ATAN2 = inc.grd -V
 
 # Azimuth angle
-gmt grdmath lookE.grd lookN.grd ATAN2 R2D = azideg.grd
+gmt grdmath lookE.grd lookN.grd ATAN2 R2D = azimuth.grd
 gmt grdmath lookE.grd lookN.grd ATAN2 = azi.grd -V
 
 echo ""
 echo "CALCULATING SLANT RANGE"
 echo ""
 # Calculation of Slant Range from law of sines using height, earth radius, incidence and look angles
+# https://en.wikipedia.org/wiki/Law_of_sines
 set earthRadius = `grep earth_radius $masterPRM|awk -F= '{print $2}'`
 set SC_height = `grep -w SC_height $masterPRM|awk -F= '{print $2}'` # Spacecraft (SC) height
 set totalHeight = `echo "$earthRadius + $SC_height"|bc`
