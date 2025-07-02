@@ -21,6 +21,7 @@ set masterPRM = "master.PRM"
 foreach f ($trans $toporad $masterPRM)
     if (! -e $f ) then
         echo "$f does not exist"
+        exit
     endif
 end
 
