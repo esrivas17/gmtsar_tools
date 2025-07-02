@@ -86,7 +86,6 @@ gmt grdmath lookE.grd lookN.grd HYPOT lookU.grd ATAN2 = inc.grd -V
 
 # Azimuth angle
 gmt grdmath lookE.grd lookN.grd ATAN2 R2D = azimuth.grd
-gmt grdmath lookE.grd lookN.grd ATAN2 = azi.grd -V
 
 echo ""
 echo "CALCULATING SLANT RANGE"
@@ -111,4 +110,5 @@ rm R2.grd lookAngle.grd rangeAngle.grd
 rm ll*
 rm topo.lltn
 rm look*.grd
+rm inc.grd
 cd ..
