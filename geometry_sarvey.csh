@@ -1,6 +1,6 @@
 #!/bin/csh -f
 #
-if ($#argv < 2) then
+if ($#argv < 1) then
    echo ""
    echo "Usage: geometry_sarvey.csh path/to/topo"
    echo ""
