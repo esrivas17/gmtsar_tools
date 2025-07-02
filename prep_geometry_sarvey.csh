@@ -45,8 +45,9 @@ gmt grdsample $toporad -G$toporad_full -I1/1 -R$x0/$x1/$y0/$y1 -V
 echo ""
 echo "OBTAINING LONGITUDE AND LATITUDE"
 echo ""
-gmt surface $trans -i0,1,3 -b15d -I1/1 -R$x0/$x1/$y0/$y1 -T.50 -Glongitude.grd -V
-gmt surface $trans -i0,1,4 -b15d -I1/1 -R$x0/$x1/$y0/$y1 -T.50 -Glatitude.grd -V
+gmt surface $trans -i0,1,3 -b15d -I1/1 -R$x0/$x1/$y0/$y1 -r -T.50 -Glongitude.grd -V
+gmt surface $trans -i0,1,4 -b15d -I1/1 -R$x0/$x1/$y0/$y1 -r -T.50 -Glatitude.grd -V
+
 
 echo ""
 echo "CALCULATION OF LOOK VECTORS ENU"
