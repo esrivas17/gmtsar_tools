@@ -12,7 +12,8 @@ geomtryRadar.h5 needs : azimuthAngle, height, incidenceAngle, latitude, longitud
 """
 
 grdGeometryFiles = {'azimuthAngle':'azimuth.grd', 'incidenceAngle':'incidence.grd', 'latitude':'latitude.grd', 
-                    'longitude':'longitude.grd', 'height':'topo_ra_full.grd', 'slantRangeDistance':'slantRange.grd'}
+                    'longitude':'longitude.grd', 'height':'topo_ra_full.grd', 'slantRangeDistance':'slantRange.grd',
+                    'shadowMask':''}
 
 def main():
     args = get_args()
@@ -25,6 +26,8 @@ def main():
     print(f'Geometry dataset dimensions: {dims}')
 
     for grdfile in grdGeometryFiles.values():
+        if not grdfile:
+            continue
         filepath = topopath.joinpath(grdfile)
         grddims = NetCDFFile(filepath.as_posix()).variables['z'].shape
         if grddims != dims:
@@ -35,11 +38,15 @@ def main():
     print(f'Writing geometryRadar.h5 stack')
     with h5.File('geometryRadar.h5', 'w') as dst:
         for dset, grdfile in grdGeometryFiles.items():
-            filepath = topopath.joinpath(grdfile)
-            nc = NetCDFFile(filepath.as_posix())
-            data = nc.variables['z'][:]
             print(f'Writing {dset}...')
-            dst.create_dataset(dset, data=data, dtype=data.dtype, shape=data.shape, chunks=True)
+            if dset == 'shadowMask':
+                data = np.zeros(dims, dtype=bool)
+                dst.create_dataset(dset, data=data, dtype=data.dtype, shape=data.shape, chunks=True, compression='lzf')
+            else:
+                filepath = topopath.joinpath(grdfile)
+                nc = NetCDFFile(filepath.as_posix())
+                data = nc.variables['z'][:]
+                dst.create_dataset(dset, data=data, dtype=data.dtype, shape=data.shape, chunks=True, compression='lzf')
 
 
 
