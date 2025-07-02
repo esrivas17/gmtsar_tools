@@ -12,10 +12,18 @@ if ($#argv > 2) then
    exit 1
 endif
 
+cd $1
 
-set trans = $1"/trans.dat"
-set toporad = $1"/topo_ra.grd"
-set masterPRM = $1"/master.PRM"
+set trans = "trans.dat"
+set toporad = "topo_ra.grd"
+set masterPRM = "master.PRM"
+
+foreach f ($trans $toporad $masterPRM)
+    if (! -e $f ) then
+        echo "$f does not exist"
+    endif
+end
+
 
 # NOTE: trans.dat is binary: (r a topo lon lat)
 
@@ -76,3 +84,5 @@ rm l*_ll.grd
 rm l*_ra.grd
 rm llt.txt
 rm R2.grd lookAngle.grd rangeAngle.grd
+
+cd ..
