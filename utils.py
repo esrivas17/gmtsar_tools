@@ -134,3 +134,41 @@ def readOldGMTFormat(grd, offset=892):
     data = data.reshape((headerDict['n_rows'], headerDict['n_columns']))
 
     return data, headerDict
+
+
+def headingFromLED(ledfile):
+    import geodezyx.conv as conv
+    with open(ledfile, 'r') as f:
+        lines = f.readlines()
+        lines = [x.strip() for x in lines]
+    # Format for LED orbits: year, dayofYear, seconds, X, Y, Z, Vx, Vy, Vz
+    _, _, _, x1,y1,z1, _, _, _ = lines[1]
+    _, _, _, x2,y2,z2, _, _, _ = lines[2]
+    lat1, lon1, _ = conv.XYZ2GEO(float(x1),float(y1),float(z1), outdeg=True)
+    lat2, lon2, _ = conv.XYZ2GEO(float(x2),float(y2),float(z2), outdeg=True)
+    return calc_bearing(lat1, lon1, lat2, lon2)
+
+
+def calc_bearing(lat1, lon1, lat2, lon2):
+  import math
+  # Reference: https://mapscaping.com/how-to-calculate-bearing-between-two-coordinates/
+  # Convert latitude and longitude to radians
+  lat1 = math.radians(lat1)
+  lon1 = math.radians(lon1)
+  lat2 = math.radians(lat2)
+  lon2 = math.radians(lon2)
+  
+  # Calculate the bearing
+  bearing = math.atan2(
+      math.sin(lon2 - lon1) * math.cos(lat2),
+      math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(lon2 - lon1)
+  )
+  
+  # Convert the bearing to degrees
+  bearing = math.degrees(bearing)
+  
+  # Make sure the bearing is positive
+  bearing = (bearing + 360) % 360
+  
+  return bearing
+

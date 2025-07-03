@@ -3,11 +3,12 @@ import os
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readOldGMTFormat
+from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readOldGMTFormat, headingFromLED
 import numpy as np
 import shutil
 import h5py as h5
 import subprocess
+from mintpy.utils import readfile
 import pdb
 
 
@@ -15,6 +16,9 @@ def main():
     args = get_args()
     slcpath = args.slcpath
     topopath = args.topopath
+
+    slcpath = slcpath.resolve()
+    topopath = topopath.resolve()
 
     slcs = sorted(glob.glob(f'{str(slcpath)}/*.SLC'))
     leds = sorted(glob.glob(f'{str(slcpath)}/*.LED'))
@@ -43,6 +47,8 @@ def main():
     bperps = [0]
     dates = [prmRefstartstr]
 
+    # Metadata
+    meta = get_metadata(prmReference, prmGrd)
 
     for prm, slc, led in zip(prms, slcs, leds):
         current_cwd = Path().cwd()
@@ -83,7 +89,7 @@ def main():
         imagPath = ifgPath.joinpath("imag.grd")
 
         # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
-        real, _ =  readOldGMTFormat(realPath)
+        real, prmGrd =  readOldGMTFormat(realPath)
         imag, _ =  readOldGMTFormat(imagPath)
         ifgNoDrho = real+1j*imag
 
@@ -112,11 +118,15 @@ def main():
         print(f'Writing SLCs...')
         dst.create_dataset("slc", data=slcStack, dtype=slcStack.dtype, shape=slcStack.shape, chunks=True)
         # Bperp
+        print(f'Writing perpendicular baseline...')
         dst.create_dataset("bperp", data=bperpStack, dtype=bperpStack.dtype, shape=bperpStack.shape)       
         # date
+        print(f'Writing dates...')
         dst.create_dataset("date", data=datesStack)
-        #for key in metadata.keys():
-         #   dst.attrs[key] = metadata[key]
+        # Metadata
+        print(f'Writing Metadata...')
+        for key in meta.keys():
+            dst.attrs[key] = meta[key]
 
     print(f'slcStack.h5 written.')
 
@@ -124,6 +134,45 @@ def main():
     print("Removing intf directory...")
     if ifgPath.is_dir():
         shutil.rmtree(ifgPath)
+
+
+def get_metadata(topopath: Path):
+    # Check master PRM
+    masterPRM = topopath.joinpath('master.PRM')
+    if not masterPRM.exists():
+        raise Exception('master.PRM seems not to exist. Please check')
+    # Read and add parameters to meta
+    meta = readfile.read_gmtsar_prm(masterPRM)
+
+    # Check if LED is in folder
+    grepOut = subprocess.run(['grep', 'led_file', masterPRM.as_posix()], capture_output=True, text=True)
+    LEDfile = topopath.joinpath(grepOut.stdout.split("=")[1].strip())
+    if not LEDfile.exists():
+        raise Exception('Seems that LED file does not exist. Please check')
+    
+    meta['HEADING'] = headingFromLED(LEDfile)
+    meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
+    meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
+
+    # Getting info from topo, inc and slantrange grd files
+    topoInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('topo_ra_full.grd').as_posix(), '-C'], capture_output=True, text=True)
+    meta['XMIN'] = topoInfo.stdout.split("\t")[1]
+    meta['XMAX'] = topoInfo.stdout.split("\t")[2]
+    meta['YMIN'] = topoInfo.stdout.split("\t")[3]
+    meta['YMAX'] = topoInfo.stdout.split("\t")[4]
+    meta['ALOOKS'] = topoInfo.stdout.split("\t")[7] #xinc
+    meta['RLOOKS'] = topoInfo.stdout.split("\t")[8] #yinc
+    meta['WIDTH'] = topoInfo.stdout.split("\t")[9]
+    meta['LENGTH'] = topoInfo.stdout.split("\t")[10]
+    incInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('incidence.grd').as_posix(), '-C', '-L2'], capture_output=True, text=True)
+    incMean = float(incInfo.stdout.split("\t")[11])
+    slantInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('slantRange.grd').as_posix(), '-C', '-L2'], capture_output=True, text=True)
+    slantMean = float(slantInfo.stdout.split("\t")[11])
+    grepOut = subprocess.run(['grep', 'led_file', masterPRM.as_posix()], capture_output=True, text=True)
+    LEDfile = grepOut.stdout.split("=")[1].strip()
+    meta['FILE_TYPE'] = 'timeseries'
+    meta = readfile.standardize_metadata(meta)
+    return meta
 
 
 def get_args():
@@ -139,7 +188,7 @@ def get_args():
     # Required arguments
     parser.add_argument('-slc', type=Path, dest='slcpath', required=True, help='Path to coregistered SLC directory')
     parser.add_argument('-topo', type=Path, dest='topopath', required=True, help='Path to topo directory')
-
+    parser.add_argument('--loadgeom', action='store_true', default=False, help='Writes geometryRadar.h5')
     return parser.parse_args()
 
 
