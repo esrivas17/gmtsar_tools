@@ -106,13 +106,8 @@ def main():
         slcNoDrho = slcSec * np.conjugate(drho) #/np.abs(drho) # if I dont add this I am scaling the result
         slc_corrected.append(slcNoDrho)
 
-        
-
         # dates
         dates.append(startstr)
-        
-        
-
 
     # slc stack
     slcStack = np.stack(slc_corrected)
