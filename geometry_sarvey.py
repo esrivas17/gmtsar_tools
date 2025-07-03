@@ -69,8 +69,6 @@ def get_metadata(topopath: Path):
     if not LEDfile.exists():
         raise Exception('Seems that LED file does not exist. Please check')
     meta['HEADING'] = headingFromLED(LEDfile)
-    meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
-    meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
 
     # Getting info from topo, inc and slantrange grd files
     topoInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('topo_ra_full.grd').as_posix(), '-C'], capture_output=True, text=True)
@@ -88,6 +86,8 @@ def get_metadata(topopath: Path):
     slantInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('slantRange.grd').as_posix(), '-C', '-L2'], capture_output=True, text=True)
     meta['SLANT_RANGE_DISTANCE'] = float(slantInfo.stdout.split("\t")[11]) #slantMean
     meta['FILE_TYPE'] = 'geometry'
+    meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
+    meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
     meta = readfile.standardize_metadata(meta)
     return meta
 
@@ -109,6 +109,6 @@ def get_args():
 
 
 if __name__ == "__main__":
-    args = get_args
+    args = get_args()
     main(topopath=args.topopath)
 
