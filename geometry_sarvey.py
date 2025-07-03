@@ -52,7 +52,7 @@ def main(*, topopath: Path):
         # Metadata
         print(f'Writing Metadata...')
         for key in meta.keys():
-            dst.attrs[key] = meta[key]        
+            dst.attrs[key] = meta[key]
 
 
 def get_metadata(topopath: Path):

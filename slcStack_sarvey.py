@@ -86,8 +86,8 @@ def main():
         ifg = slcRef * np.conjugate(slcSec)
 
         # Real and Imag parts of ifg
-        realPath = ifgPath.joinpath("real.grd")
-        imagPath = ifgPath.joinpath("imag.grd")
+        realPath = ifgPath.resolve().joinpath("real.grd")
+        imagPath = ifgPath.resolve().joinpath("imag.grd")
 
         # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
         real, _ =  readOldGMTFormat(realPath)
