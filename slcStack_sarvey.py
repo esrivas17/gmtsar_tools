@@ -48,7 +48,7 @@ def main():
     dates = [prmRefstartstr]
 
     # Metadata
-    meta = get_metadata(prmReference, prmGrd)
+    meta = get_metadata(topopath)
 
     for prm, slc, led in zip(prms, slcs, leds):
         current_cwd = Path().cwd()
@@ -94,7 +94,7 @@ def main():
         ifgNoDrho = real+1j*imag
 
         drho = ifg * np.conjugate(ifgNoDrho)
-        slcNoDrho = slcSec * np.conjugate(drho)/np.abs(drho) # if I dont add this I am scaling the result
+        slcNoDrho = slcSec * np.conjugate(drho) #/np.abs(drho) # if I dont add this I am scaling the result
         slc_corrected.append(slcNoDrho)
 
         # Perp baseline
@@ -149,10 +149,7 @@ def get_metadata(topopath: Path):
     LEDfile = topopath.joinpath(grepOut.stdout.split("=")[1].strip())
     if not LEDfile.exists():
         raise Exception('Seems that LED file does not exist. Please check')
-    
     meta['HEADING'] = headingFromLED(LEDfile)
-    meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
-    meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
 
     # Getting info from topo, inc and slantrange grd files
     topoInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('topo_ra_full.grd').as_posix(), '-C'], capture_output=True, text=True)
@@ -171,6 +168,8 @@ def get_metadata(topopath: Path):
     grepOut = subprocess.run(['grep', 'led_file', masterPRM.as_posix()], capture_output=True, text=True)
     LEDfile = grepOut.stdout.split("=")[1].strip()
     meta['FILE_TYPE'] = 'timeseries'
+    meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
+    meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
     meta = readfile.standardize_metadata(meta)
     return meta
 
@@ -188,7 +187,6 @@ def get_args():
     # Required arguments
     parser.add_argument('-slc', type=Path, dest='slcpath', required=True, help='Path to coregistered SLC directory')
     parser.add_argument('-topo', type=Path, dest='topopath', required=True, help='Path to topo directory')
-    parser.add_argument('--loadgeom', action='store_true', default=False, help='Writes geometryRadar.h5')
     return parser.parse_args()
 
 
