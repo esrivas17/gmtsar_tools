@@ -74,12 +74,13 @@ def main():
         ifgPath.resolve().joinpath(slcReference.split("/")[-1]).symlink_to(slcReference)
         ifgPath.resolve().joinpath(ledReference.split("/")[-1]).symlink_to(ledReference)
 
+        # go to ifg directory
         os.chdir(ifgPath)
+
         cmd_lst = ["intf.csh", prmReference.split("/")[-1], prm.split("/")[-1], "-topo", str(toporapath)]
         if not try_command(cmd_lst):
             raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
-        os.chdir(str(current_cwd))
-
+        
         # making interferogram
         slcSec = getSlcData(slc, prm)
         ifg = slcRef * np.conjugate(slcSec)
@@ -89,7 +90,7 @@ def main():
         imagPath = ifgPath.joinpath("imag.grd")
 
         # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
-        real, prmGrd =  readOldGMTFormat(realPath)
+        real, _ =  readOldGMTFormat(realPath)
         imag, _ =  readOldGMTFormat(imagPath)
         ifgNoDrho = real+1j*imag
 
@@ -104,6 +105,9 @@ def main():
 
         # dates
         dates.append(startstr)
+        
+        # go back in directory
+        os.chdir(str(current_cwd))
 
 
     # slc stack
