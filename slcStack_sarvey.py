@@ -81,13 +81,21 @@ def main():
         if not try_command(cmd_lst):
             raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
         
+        # Perp baseline while I am in ifgPath directory
+        sat_output = subprocess.run(['SAT_baseline', prmReference, prm], capture_output=True, text=True)
+        bperp_grep = subprocess.run(['grep', 'B_perpendicular'], input=sat_output.stdout, capture_output=True, text=True)
+        bperps.append(float(bperp_grep.stdout.split("=")[-1].strip()))
+
+        # go back in directory
+        os.chdir(str(current_cwd))
+
         # making interferogram
         slcSec = getSlcData(slc, prm)
         ifg = slcRef * np.conjugate(slcSec)
 
         # Real and Imag parts of ifg
-        realPath = ifgPath.resolve().joinpath("real.grd")
-        imagPath = ifgPath.resolve().joinpath("imag.grd")
+        realPath = ifgPath.joinpath("real.grd")
+        imagPath = ifgPath.joinpath("imag.grd")
 
         # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
         real, _ =  readOldGMTFormat(realPath)
@@ -98,16 +106,12 @@ def main():
         slcNoDrho = slcSec * np.conjugate(drho) #/np.abs(drho) # if I dont add this I am scaling the result
         slc_corrected.append(slcNoDrho)
 
-        # Perp baseline
-        sat_output = subprocess.run(['SAT_baseline', prmReference, prm], capture_output=True, text=True)
-        bperp_grep = subprocess.run(['grep', 'B_perpendicular'], input=sat_output.stdout, capture_output=True, text=True)
-        bperps.append(float(bperp_grep.stdout.split("=")[-1].strip()))
+        
 
         # dates
         dates.append(startstr)
         
-        # go back in directory
-        os.chdir(str(current_cwd))
+        
 
 
     # slc stack
