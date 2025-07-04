@@ -60,7 +60,7 @@ def main():
         startstr = fracyear2yyyymmdd(sc_clock_start).strftime("%Y%m%d")
         if startstr in skipdates:
             continue
-        
+
         intfstr = f'{prmRefstartstr}_{startstr}'
 
         # creates folders
@@ -139,8 +139,8 @@ def main():
 
     # removing single master intfs
     print("Removing intf directory...")
-    if ifgPath.is_dir():
-        shutil.rmtree(ifgPath)
+    if ifgsPath.is_dir():
+        shutil.rmtree(ifgsPath)
 
 
 def get_metadata(topopath: Path):
