@@ -16,6 +16,7 @@ def main():
     args = get_args()
     slcpath = args.slcpath
     topopath = args.topopath
+    skipdates = args.skipdates
 
     slcpath = slcpath.resolve()
     topopath = topopath.resolve()
@@ -57,6 +58,9 @@ def main():
 
         sc_clock_start = float(grep(prm, 'SC_clock_start'))
         startstr = fracyear2yyyymmdd(sc_clock_start).strftime("%Y%m%d")
+        if startstr in skipdates:
+            continue
+        
         intfstr = f'{prmRefstartstr}_{startstr}'
 
         # creates folders
@@ -190,6 +194,7 @@ def get_args():
     # Required arguments
     parser.add_argument('-slc', type=Path, dest='slcpath', required=True, help='Path to coregistered SLC directory')
     parser.add_argument('-topo', type=Path, dest='topopath', required=True, help='Path to topo directory')
+    parser.add_argument('--skipdates', dest='skipdates', nargs='*', type=str, help='Dates to skip. e.g. 20150101 20160101')
     return parser.parse_args()
 
 
