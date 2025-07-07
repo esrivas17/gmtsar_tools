@@ -98,7 +98,7 @@ def getSlcData(slcPath, prmPath, scale=2.5e-7):
     slc_data = np.fromfile(slcPath, dtype=np.int16)
     slc_data = slc_data.reshape(-1,2)
     zmask = (slc_data[:, 0] == 0) & (slc_data[:, 1] == 0)
-    slc_data[zmask] = 1
+    slc_data[zmask,0] = 1 # making real part 1
     slc_data = slc_data.astype(np.float32)*scale
     slc_data = slc_data[:,0] + 1j*slc_data[:,1]
     #slc_data = slc_data.astype(np.float32).view(np.complex64)

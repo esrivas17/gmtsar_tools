@@ -97,17 +97,18 @@ def main():
         slcSec = getSlcData(slc, prm)
         ifg = slcRef * np.conjugate(slcSec)
 
-        # Real and Imag parts of ifg
+        # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
         realPath = ifgPath.joinpath("real.grd")
         imagPath = ifgPath.joinpath("imag.grd")
-
-        # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
         real, _ =  readOldGMTFormat(realPath)
         imag, _ =  readOldGMTFormat(imagPath)
         ifgNoDrho = real+1j*imag
+        ifgNoDrho = ifgNoDrho/np.abs(ifgNoDrho)
 
+        # Ifg with and without topo phase
         drho = ifg * np.conjugate(ifgNoDrho)
-        slcNoDrho = slcSec * np.conjugate(drho) #/np.abs(drho) # if I dont add this I am scaling the result
+        drho = drho / np.abs(drho)
+        slcNoDrho = slcSec * np.conjugate(drho) # if I dont add this I am scaling the result
         slc_corrected.append(slcNoDrho)
 
         # dates
