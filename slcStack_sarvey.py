@@ -16,7 +16,7 @@ def main():
     args = get_args()
     slcpath = args.slcpath
     topopath = args.topopath
-    skipdates = args.skipdates
+    skipdates = list() if args.skipdates is None else args.skipdates
 
     slcpath = slcpath.resolve()
     topopath = topopath.resolve()
@@ -58,6 +58,7 @@ def main():
 
         sc_clock_start = float(grep(prm, 'SC_clock_start'))
         startstr = fracyear2yyyymmdd(sc_clock_start).strftime("%Y%m%d")
+
         if startstr in skipdates:
             continue
 
