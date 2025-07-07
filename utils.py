@@ -87,13 +87,21 @@ def read_baseline_table(baselinetab: Path):
     dfsorted = data.sort_values(by='date_dt')
     return dfsorted
 
-def getSlcData(slcPath, prmPath):
+def getSlcData(slcPath, prmPath, scale=2.5e-7):
+    """
+    Factor comes from GMTSAR processing
+    """
     #Get rows and columns
     nlines = int(grep(prmPath, 'num_lines'))
     rgbins = int(grep(prmPath, 'num_rng_bins'))
     # read slc and reshape
     slc_data = np.fromfile(slcPath, dtype=np.int16)
-    slc_data = slc_data.astype(np.float32).view(np.complex64)
+    slc_data = slc_data.reshape(-1,2)
+    zmask = (slc_data[:, 0] == 0) & (slc_data[:, 1] == 0)
+    slc_data[zmask] = 1
+    slc_data = slc_data.astype(np.float32)*scale
+    slc_data = slc_data[:,0] + 1j*slc_data[:,1]
+    #slc_data = slc_data.astype(np.float32).view(np.complex64)
     try:
         slc_data = slc_data.reshape((nlines,rgbins))
     except ValueError as e:
