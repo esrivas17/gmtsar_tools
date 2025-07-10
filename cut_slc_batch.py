@@ -57,7 +57,7 @@ def main():
 
     # Symlinks of LED files
     for ledfile in ledfiles:
-        current_cwd.joinpath(ledfile).symlink_to(path_savedir.joinpath(ledfile))
+        path_savedir.joinpath(ledfile).symlink_to(current_cwd.joinpath(ledfile))
 
     print("Done")
     return 0
