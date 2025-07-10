@@ -20,11 +20,11 @@ def main():
     # Go to SLC directory
     os.chdir(directory)
     current_cwd = Path().cwd()
-    prmfiles = glob.glob('*PRM')
+    prmfiles = [Path(prmf) for prmf in glob.glob('*PRM')]
     print(f'Num of PRM files found: {len(prmfiles)}')
-    slcfiles = [Path(prmf).with_suffix('.SLC') for prmf in prmfiles if Path(prmf).with_suffix('.SLC').exists()]
+    slcfiles = [prmf.with_suffix('.SLC') for prmf in prmfiles if prmf.with_suffix('.SLC').exists()]
     print(f'Num of SLC files found: {len(slcfiles)}')
-    ledfiles = [Path(prmf).with_suffix('.LED') for prmf in prmfiles if Path(prmf).with_suffix('.LED').exists()]
+    ledfiles = [prmf.with_suffix('.LED') for prmf in prmfiles if prmf.with_suffix('.LED').exists()]
     print(f'Num of LED files found: {len(ledfiles)}')
 
     if len(prmfiles) != len(slcfiles) != len(ledfiles):
