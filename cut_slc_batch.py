@@ -19,12 +19,16 @@ def main():
 
     # Go to SLC directory
     os.chdir(directory)
+    current_cwd = Path().cwd()
     prmfiles = glob.glob('*PRM')
-    num_prmfiles = len(prmfiles)
-    print(f'Num of PRM files found: {num_prmfiles}')
-    prmfiles = [Path(prmf) for prmf in prmfiles if Path(prmf).with_suffix('.SLC').exists()]
-    num_slcfiles = len(prmfiles)
-    print(f'Num of SLC files found: {num_slcfiles}')
+    print(f'Num of PRM files found: {len(prmfiles)}')
+    slcfiles = [Path(prmf).with_suffix('.SLC') for prmf in prmfiles if Path(prmf).with_suffix('.SLC').exists()]
+    print(f'Num of SLC files found: {len(slcfiles)}')
+    ledfiles = [Path(prmf).with_suffix('.LED') for prmf in prmfiles if Path(prmf).with_suffix('.LED').exists()]
+    print(f'Num of LED files found: {len(ledfiles)}')
+
+    if len(prmfiles) != len(slcfiles) != len(ledfiles):
+        raise Exception(f'Number of PRM, SLC and LED files do not match')
 
     print("Cutting SLCs..\n")
     for prmfile in prmfiles:
@@ -50,6 +54,10 @@ def main():
         newcutslc = "_".join(cutslc.stem.split("_")[:-1]) + cutslc.suffix
         cutprm.rename(path_savedir.joinpath(newcutprm))
         cutslc.rename(path_savedir.joinpath(newcutslc))
+
+    # Symlinks of LED files
+    for ledfile in ledfiles:
+        current_cwd.joinpath(ledfile).symlink_to(path_savedir.joinpath(ledfile))
 
     print("Done")
     return 0
