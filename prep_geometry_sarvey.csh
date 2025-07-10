@@ -24,6 +24,10 @@ if (! -e $masterPRM ) then
     exit 1
 endif
 
+if (! -e "dem.grd" ) then
+    echo "dem-grd does not exist. Run make_dem.csh"
+    exit 1
+endif
 
 # || or, && and
 if (! -e $toporad || ! -e $trans) then
