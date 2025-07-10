@@ -94,7 +94,7 @@ def main():
         # go back in directory
         os.chdir(str(current_cwd))
 
-        # making interferogram
+        # making interferogram between reference and secondary SLCs
         slcSec = getSlcData(slc, prm)
         ifg = slcRef * np.conjugate(slcSec)
 
@@ -104,12 +104,12 @@ def main():
         real, _ =  readOldGMTFormat(realPath)
         imag, _ =  readOldGMTFormat(imagPath)
         ifgNoDrho = real+1j*imag
-        ifgNoDrho = ifgNoDrho/np.abs(ifgNoDrho)
+        ifgNoDrho = ifgNoDrho/np.abs(ifgNoDrho) # normalizing to not affect the amplitude
 
         # Ifg with and without topo phase
         drho = ifg * np.conjugate(ifgNoDrho)
-        drho = drho / np.abs(drho)
-        slcNoDrho = slcSec * np.conjugate(drho) # if I dont add this I am scaling the result
+        drho = drho / np.abs(drho) 
+        slcNoDrho = slcSec * np.conjugate(drho) 
         slc_corrected.append(slcNoDrho)
 
         # dates
