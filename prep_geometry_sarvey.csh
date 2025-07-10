@@ -31,7 +31,9 @@ endif
 
 # || or, && and
 if (! -e $toporad || ! -e $trans) then
+    echo ""
     echo "$toporad or $trans do not exist. Run dem2topo_ra.csh"
+    echo ""
     dem2topo_ra.csh $masterPRM dem.grd 0
 endif
 
