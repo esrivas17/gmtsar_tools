@@ -6,7 +6,7 @@ if ($#argv < 1) then
    echo ""
    echo " Creates grd files for latitude, longitude, incidence, azimuth and slantRange"
    echo " topo folder must contain: trans.dat, topo_ra.grd and master.PRM"
-   echo " topo_ra.grd is produced by dem2topo_ra.csh"
+   echo " topo_ra.grd and trans.dat is produced by dem2topo_ra.csh"
    echo ""
    echo "Example: geometry_sarvey.csh path/to/topo"
    echo ""
@@ -19,12 +19,18 @@ set trans = "trans.dat"
 set toporad = "topo_ra.grd"
 set masterPRM = "master.PRM"
 
-foreach f ($trans $toporad $masterPRM)
-    if (! -e $f ) then
-        echo "$f does not exist"
-        exit
-    endif
-end
+if (! -e $masterPRM ) then
+    echo "$masterPRM does not exist. Please check"
+    exit 1
+endif
+
+
+# || or, && and
+if (! -e $toporad || ! -e $trans) then
+    echo "$toporad or $trans do not exist. Run dem2topo_ra.csh"
+    dem2topo_ra.csh $masterPRM dem.grd 0
+endif
+
 
 # NOTE: trans.dat is binary: (r a topo lon lat)
 
