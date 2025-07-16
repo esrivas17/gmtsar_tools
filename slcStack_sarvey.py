@@ -17,7 +17,7 @@ def main():
     slcpath = args.slcpath
     topopath = args.topopath
     skipdates = list() if args.skipdates is None else args.skipdates
-
+    nocorrectflag = args.nocorrectflag
     slcpath = slcpath.resolve()
     topopath = topopath.resolve()
 
@@ -62,67 +62,80 @@ def main():
         if startstr in skipdates:
             continue
 
-        intfstr = f'{prmRefstartstr}_{startstr}'
-
-        # creates folders
-        ifgPath = ifgsPath.joinpath(intfstr)
-        if not ifgPath.exists():
-            ifgPath.mkdir()
+        # No correction
+        if nocorrectflag:
+            # Saves as slc_corrected however this has no correction from topo earth component
+            print(f'Creating slc stack without removing topo-earth component')
+            slcSec = getSlcData(slc, prm)
+            slc_corrected.append(slcSec)
+            # dates
+            dates.append(startstr)
         else:
-            print(f'Ifg folder: {ifgPath.as_posix()} exists')
-        # symlinks: PRM, SLC, LED, topo_ra
-        ifgPath.resolve().joinpath(prm.split("/")[-1]).symlink_to(prm)
-        ifgPath.resolve().joinpath(slc.split("/")[-1]).symlink_to(slc)
-        ifgPath.resolve().joinpath(led.split("/")[-1]).symlink_to(led)
-        ifgPath.resolve().joinpath(toporapath.name).symlink_to(toporapath.as_posix())
-        ifgPath.resolve().joinpath(prmReference.split("/")[-1]).symlink_to(prmReference)
-        ifgPath.resolve().joinpath(slcReference.split("/")[-1]).symlink_to(slcReference)
-        ifgPath.resolve().joinpath(ledReference.split("/")[-1]).symlink_to(ledReference)
+            intfstr = f'{prmRefstartstr}_{startstr}'
+            # creates folders
+            ifgPath = ifgsPath.joinpath(intfstr)
+            if not ifgPath.exists():
+                ifgPath.mkdir()
+            else:
+                print(f'Ifg folder: {ifgPath.as_posix()} exists')
+            # symlinks: PRM, SLC, LED, topo_ra
+            ifgPath.resolve().joinpath(prm.split("/")[-1]).symlink_to(prm)
+            ifgPath.resolve().joinpath(slc.split("/")[-1]).symlink_to(slc)
+            ifgPath.resolve().joinpath(led.split("/")[-1]).symlink_to(led)
+            ifgPath.resolve().joinpath(toporapath.name).symlink_to(toporapath.as_posix())
+            ifgPath.resolve().joinpath(prmReference.split("/")[-1]).symlink_to(prmReference)
+            ifgPath.resolve().joinpath(slcReference.split("/")[-1]).symlink_to(slcReference)
+            ifgPath.resolve().joinpath(ledReference.split("/")[-1]).symlink_to(ledReference)
 
-        # go to ifg directory
-        os.chdir(ifgPath)
+            # go to ifg directory
+            os.chdir(ifgPath)
 
-        cmd_lst = ["intf.csh", prmReference.split("/")[-1], prm.split("/")[-1], "-topo", str(toporapath)]
-        if not try_command(cmd_lst):
-            raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
-        
-        # Perp baseline while I am in ifgPath directory
-        sat_output = subprocess.run(['SAT_baseline', prmReference, prm], capture_output=True, text=True)
-        bperp_grep = subprocess.run(['grep', 'B_perpendicular'], input=sat_output.stdout, capture_output=True, text=True)
-        bperps.append(float(bperp_grep.stdout.split("=")[-1].strip()))
+            cmd_lst = ["intf.csh", prmReference.split("/")[-1], prm.split("/")[-1], "-topo", str(toporapath)]
+            if not try_command(cmd_lst):
+                raise  Exception(f"Problem running intf.csh in: {ifgsPath}")
+            
+            # Perp baseline while I am in ifgPath directory
+            sat_output = subprocess.run(['SAT_baseline', prmReference, prm], capture_output=True, text=True)
+            bperp_grep = subprocess.run(['grep', 'B_perpendicular'], input=sat_output.stdout, capture_output=True, text=True)
+            bperps.append(float(bperp_grep.stdout.split("=")[-1].strip()))
 
-        # go back in directory
-        os.chdir(str(current_cwd))
+            # go back in directory
+            os.chdir(str(current_cwd))
 
-        # making interferogram between reference and secondary SLCs
-        slcSec = getSlcData(slc, prm)
-        ifg = slcRef * np.conjugate(slcSec)
+            # making interferogram between reference and secondary SLCs
+            slcSec = getSlcData(slc, prm)
+            ifg = slcRef * np.conjugate(slcSec)
 
-        # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
-        realPath = ifgPath.joinpath("real.grd")
-        imagPath = ifgPath.joinpath("imag.grd")
-        real, _ =  readOldGMTFormat(realPath)
-        imag, _ =  readOldGMTFormat(imagPath)
-        ifgNoDrho = real+1j*imag
-        ifgNoDrho = ifgNoDrho/np.abs(ifgNoDrho) # normalizing to not affect the amplitude
+            # Read real and imaginary part of interferogram formed from GMTSAR using intf.csh
+            realPath = ifgPath.joinpath("real.grd")
+            imagPath = ifgPath.joinpath("imag.grd")
+            real, _ =  readOldGMTFormat(realPath)
+            imag, _ =  readOldGMTFormat(imagPath)
+            ifgNoDrho = real+1j*imag
+            ifgNoDrho = ifgNoDrho/np.abs(ifgNoDrho) # normalizing to not affect the amplitude
 
-        # Ifg with and without topo phase
-        drho = ifg * np.conjugate(ifgNoDrho)
-        drho = drho / np.abs(drho) 
-        slcNoDrho = slcSec * np.conjugate(drho) 
-        slc_corrected.append(slcNoDrho)
+            # Ifg with and without topo phase
+            drho = ifg * np.conjugate(ifgNoDrho)
+            drho = drho / np.abs(drho) 
+            slcNoDrho = slcSec * np.conjugate(drho) 
+            slc_corrected.append(slcNoDrho)
 
-        # dates
-        dates.append(startstr)
+            # dates
+            dates.append(startstr)
 
     # slc stack
     slcStack = np.stack(slc_corrected)
     bperpStack = np.array(bperps, dtype=np.float32)
     datesStack = np.array(dates, dtype=np.bytes_)
 
+    if nocorrectflag:
+        outfname = 'slcStack_topoearth.h5'
+    else:
+        outfname = 'slcStack.h5'
+
     # writing to h5file
     print(f'Writing SLC stack')
-    with h5.File('slcStack.h5', 'w') as dst:
+    with h5.File(outfname, 'w') as dst:
         # slc
         print(f'Writing SLCs...')
         dst.create_dataset("slc", data=slcStack, dtype=slcStack.dtype, shape=slcStack.shape, chunks=True)
@@ -179,6 +192,7 @@ def get_metadata(topopath: Path):
     meta['FILE_TYPE'] = 'timeseries'
     meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
     meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
+    meta['UNIT'] = 'i'
     meta = readfile.standardize_metadata(meta)
     return meta
 
@@ -197,6 +211,7 @@ def get_args():
     parser.add_argument('-slc', type=Path, dest='slcpath', required=True, help='Path to coregistered SLC directory')
     parser.add_argument('-topo', type=Path, dest='topopath', required=True, help='Path to topo directory')
     parser.add_argument('--skipdates', dest='skipdates', nargs='*', type=str, help='Dates to skip. e.g. 20150101 20160101')
+    parser.add_argument('--nocorrect', dest='nocorrectflag', action='store_true', default=False, help='Flag to skip topo-earth phase removal')
     return parser.parse_args()
 
 
