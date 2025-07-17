@@ -110,7 +110,7 @@ def main():
         # Ifg with and without topo phase
         drho = ifg * np.conjugate(ifgNoDrho)
         drho = drho / np.abs(drho)
-        slcNoDrho = slcSec * np.conjugate(drho)
+        slcNoDrho = slcSec * drho # adding drho correction
         slcs_noDrho.append(slcNoDrho)
 
         # no corrected slcs
