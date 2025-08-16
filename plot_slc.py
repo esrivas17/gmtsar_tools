@@ -27,7 +27,7 @@ def main():
     
     if directory:
         if not directory.exists():
-            raise Exception(f'SLC directory: {directory} does not exist')
+            raise Exception(f"SLC directory: {directory} does not exist")
     
         slcfiles = glob.glob(f'{directory.as_posix()}/*.SLC')
         slcfiles = sorted([Path(x) for x in slcfiles])
@@ -42,12 +42,12 @@ def main():
             if r != 0:
                 slcfiles_exceptions.append(slcfile)
                 count_badfiles += 1
-                print(f'Something wrong with plot_slc function\nArguments: {slcfile, prmfile, savedir}. Skipping...')
+                print(f"Something wrong with plot_slc function\nArguments: {slcfile, prmfile, savedir}. Skipping...")
             else:
                 count += 1
-        print(f'SUMMARY: Num of SLCs: {totalslcs}. Num of plots creates: {count}. Num of dates with issues: {count_badfiles}')
+        print(f"SUMMARY: Num of SLCs: {totalslcs}. Num of plots creates: {count}. Num of dates with issues: {count_badfiles}")
         if count_badfiles > 0:
-            print(f'SLC files with issues: \n{"\n".join(slcfiles_exceptions)}')
+            print(f"SLC files with issues: \n{'\n'.join(slcfiles_exceptions)}")
         return 0
     
     elif filepath:
@@ -57,7 +57,7 @@ def main():
         prmfile = filepath.with_suffix('.PRM')
         r = plot_slc(filepath, prmfile, savedir, band, showflag, overwriteflag)
         if r != 0:
-            raise Exception(f'Something wrong with plot_slc function\nArguments: {filepath, prmfile, savedir}')
+            raise Exception(f"Something wrong with plot_slc function\nArguments: {filepath, prmfile, savedir}")
 
         return 0
     else:
