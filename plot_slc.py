@@ -30,12 +30,22 @@ def main():
         slcfiles = glob.glob(f'{directory.as_posix()}/*.SLC')
         slcfiles = sorted([Path(x) for x in slcfiles])
 
+        slcfiles_exceptions = list()
+        count = 0
+        count_badfiles = 0
+        totalslcs = len(slcfiles)
         for slcfile in slcfiles:
             prmfile = slcfile.with_suffix('.PRM')
             r = plot_slc(slcfile, prmfile, savedir, band, showflag)
             if r != 0:
-                raise Exception(f'Something wrong with plot_slc function\nArguments: {slcfile, prmfile, savedir}')
-
+                slcfiles_exceptions.append(slcfile)
+                count_badfiles += 1
+                print(f'Something wrong with plot_slc function\nArguments: {slcfile, prmfile, savedir}. Skipping...')
+            else:
+                count += 1
+        print(f'SUMMARY: Num of SLCs: {totalslcs}. Num of plots creates: {count}. Num of dates with issues: {count_badfiles}')
+        if count_badfiles > 0:
+            print(f'SLC files with issues: \n{"\n".join(slcfiles_exceptions)}')
         return 0
     elif filepath:
         if filepath.suffix != '.SLC':
