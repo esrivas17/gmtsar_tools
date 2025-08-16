@@ -47,7 +47,7 @@ def main():
                 count += 1
         print(f"SUMMARY: Num of SLCs: {totalslcs}. Num of plots creates: {count}. Num of dates with issues: {count_badfiles}")
         if count_badfiles > 0:
-            bad_slcfiles_str = '\n'.join(slcfiles_exceptions)
+            bad_slcfiles_str = '\n'.join([str(x) for x in slcfiles_exceptions])
             print(f"SLC files with issues: \n{bad_slcfiles_str}")
         return 0
     
