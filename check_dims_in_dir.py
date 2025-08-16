@@ -16,6 +16,9 @@ def main():
     if len(SLCfiles) == 0:
         raise Exception(f'No SLC files found in directory: {directory}')
     
+    count_ok = 0
+    count_bad = 0
+    slcfiles_bad = list()
     for slcfile in SLCfiles:
         prmfile = Path(slcfile).with_suffix('.PRM')
         
@@ -41,11 +44,19 @@ def main():
             slc_data = slc_data.reshape((nlines,rgbins))
         except Exception as e:
             print(f'Something wrong reshaping SLC: {slcfile}\nnrows: {nlines} range: {rgbins} SLC shape: {slc_data.shape}\nException: {e}\n')
+            count_bad += 1
+            slcfiles_bad.append(slcfile)
             del slc_data
             continue
         else:
+            count_ok += 1
             print(f'SLC shape: {slc_data.shape} matches nrows {nlines} and range bins {rgbins}\nFile:{slcfile}\n')
             del slc_data
+    
+    print(f'SUMMARY: Total SLCs in folder: {len(SLCfiles)}. Num of SLCs with correct sizes: {count_ok}. Num of SLCs with incorrect sizes: {count_bad}')
+    if count_bad > 0:
+        bad_slcfiles_str = '\n'.join([str(x) for x in slcfiles_bad])
+        print(f"SLC files with not matching sizes with PRMs: \n{bad_slcfiles_str}")
 
 
 def get_args():

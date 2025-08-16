@@ -65,9 +65,6 @@ def main():
         raise Exception(f'Why I am here?')
 
 
-#def open_gmtsar_slc(slcfile:Path, prmfile:Path):
-
-
 def plot_slc(slcfile:Path, prmfile:Path, savedir:Path, bands: list, showflag=False, overwriteflag=False):
     if 'phase' in bands:
         phasefilename = savedir.joinpath(slcfile.stem + '_pha.png')
