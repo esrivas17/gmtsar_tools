@@ -28,7 +28,7 @@ def main():
             raise Exception(f'SLC directory: {directory} does not exist')
     
         slcfiles = glob.glob(f'{directory.as_posix()}/*.SLC')
-        slcfiles = [Path(x) for x in slcfiles]
+        slcfiles = sorted([Path(x) for x in slcfiles])
 
         for slcfile in slcfiles:
             prmfile = slcfile.with_suffix('.PRM')

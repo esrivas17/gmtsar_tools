@@ -86,6 +86,7 @@ def get_metadata(topopath: Path):
     slantInfo = subprocess.run(['gmt', 'grdinfo',  topopath.joinpath('slantRange.grd').as_posix(), '-C', '-L2'], capture_output=True, text=True)
     meta['SLANT_RANGE_DISTANCE'] = float(slantInfo.stdout.split("\t")[11]) #slantMean
     meta['FILE_TYPE'] = 'geometry'
+    meta['PROCESSOR'] = 'isce' # needed in case we use file for mintpy
     meta['AZIMUTH_PIXEL_SIZE'] *= int(meta['ALOOKS'])
     meta['RANGE_PIXEL_SIZE'] *= int(meta['RLOOKS'])
     meta = readfile.standardize_metadata(meta)
