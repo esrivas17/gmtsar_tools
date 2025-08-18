@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 import struct
+import geodezyx.conv as conv
 import pdb
 
 
@@ -145,7 +146,6 @@ def readOldGMTFormat(grd, offset=892):
 
 
 def headingFromLED(ledfile):
-    import geodezyx.conv as conv
     with open(ledfile, 'r') as f:
         lines = f.readlines()
         lines = [x.strip() for x in lines]
