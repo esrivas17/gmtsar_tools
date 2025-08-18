@@ -19,7 +19,7 @@ def main():
     count_ok = 0
     count_bad = 0
     slcfiles_bad = list()
-    for slcfile in SLCfiles:
+    for slcfile in sorted(SLCfiles):
         prmfile = Path(slcfile).with_suffix('.PRM')
         
         if not prmfile.exists():

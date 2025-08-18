@@ -25,7 +25,12 @@ if (! -e $masterPRM ) then
 endif
 
 if (! -e "dem.grd" ) then
-    echo "dem-grd does not exist. Run make_dem.csh"
+    echo "dem.grd does not exist. Run make_dem.csh"
+    exit 1
+endif
+
+if (! -e "*.LED" ) then
+    echo "LED file from master does not exist. Create a symlink or copy it"
     exit 1
 endif
 
