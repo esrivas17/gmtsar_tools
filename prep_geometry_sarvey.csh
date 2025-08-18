@@ -5,10 +5,12 @@ if ($#argv < 1) then
    echo "Usage: geometry_sarvey.csh path/to/topo"
    echo ""
    echo " Creates grd files for latitude, longitude, incidence, azimuth and slantRange"
-   echo " topo folder must contain: trans.dat, topo_ra.grd and master.PRM"
+   echo " topo folder must contain: trans.dat, topo_ra.grd, master.PRM and LED master file"
    echo " topo_ra.grd and trans.dat is produced by dem2topo_ra.csh"
    echo ""
-   echo "Example: geometry_sarvey.csh path/to/topo"
+   echo " If either topo_ra.grd or trans.dat do not exist, them dem2topo_ra.csh is run"
+   echo ""
+   echo " Example: geometry_sarvey.csh path/to/topo"
    echo ""
    exit 1
 endif
