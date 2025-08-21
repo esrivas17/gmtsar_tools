@@ -75,10 +75,14 @@ echo ""
 gmt gmtconvert $trans -o3,4,2 -bi5d > llt.xyz
 SAT_look $masterPRM < llt.xyz > topo.lltn
 
+set pix_m = 60
+set incs = `m2s.csh $pix_m lle`	
+set R = `gmt gmtinfo lle -I$incs[2]`
+
 # Block median / mean - Look angles (ENU) come with low sampling and in lon lat coordinates
-gmt blockmedian topo.lltn `gmt info topo.lltn -I0.08333333333` -I.00083333333333 -i0,1,3 -r -V -GlE_ll.grd
-gmt blockmedian topo.lltn `gmt info topo.lltn -I0.08333333333` -I.00083333333333 -i0,1,4 -r -V -GlN_ll.grd
-gmt blockmedian topo.lltn `gmt info topo.lltn -I0.08333333333` -I.00083333333333 -i0,1,5 -r -V -GlU_ll.grd
+gmt blockmedian topo.lltn $R -I$incs[1] -i0,1,3 -r -V -GlE_ll.grd
+gmt blockmedian topo.lltn $R -I$incs[1] -i0,1,4 -r -V -GlN_ll.grd
+gmt blockmedian topo.lltn $R -I$incs[1] -i0,1,5 -r -V -GlU_ll.grd
 
 echo ""
 echo "PROJECT LOOK VECTOR BACK TO RADAR COORDINATES"
