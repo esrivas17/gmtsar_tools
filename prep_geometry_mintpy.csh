@@ -56,20 +56,15 @@ gmt grdmath look_E.grd look_N.grd HYPOT look_U.grd ATAN2 R2D = inc.grd -V
 gmt grdmath look_E.grd look_N.grd ATAN2 R2D = azi.grd -V
 
 # Resample
-set x0 = `gmt grdinfo grid_ll.grd -C | awk '{print $2}'`
-set x1 = `gmt grdinfo grid_ll.grd -C | awk '{print $3}'`
-set y0 = `gmt grdinfo grid_ll.grd -C | awk '{print $4}'`
-set y1 = `gmt grdinfo grid_ll.grd -C | awk '{print $5}'`
-set zmax = `gmt grdinfo grid_ll.grd -C | awk '{print $6}'`
-set xinc = `gmt grdinfo grid_ll.grd -C | awk '{print $8}'`
-set yinc = `gmt grdinfo grid_ll.grd -C | awk '{print $9}'`
+set incre = `gmt grdinfo grid_ll.grd -I`
+set region = `gmt grdinfo grid_ll.grd -I-`
 
 echo ""
 echo "RESAMPLING INCIDENCE, AZIMUTH AND TOPO"
 echo ""
-gmt grdsample inc.grd -Gincidence.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
-gmt grdsample azi.grd -Gazimuth.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
-gmt grdsample topo_ll.grd -Gheight.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
+gmt grdsample inc.grd -Gincidence.grd $incre $region -nb -V
+gmt grdsample azi.grd -Gazimuth.grd $incre $region -nb -V
+gmt grdsample topo_ll.grd -Gheight.grd $incre $region -nb -V
 
 echo "Done"
 
