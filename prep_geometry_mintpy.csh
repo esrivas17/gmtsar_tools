@@ -67,9 +67,9 @@ set yinc = `gmt grdinfo grid_ll.grd -C | awk '{print $9}'`
 echo ""
 echo "RESAMPLING INCIDENCE, AZIMUTH AND TOPO"
 echo ""
-gmt grdsample inc.grd -Gincidence.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -V
-gmt grdsample azi.grd -Gazimuth.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -V
-gmt grdsample topo_ll.grd -Gheight.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -V
+gmt grdsample inc.grd -Gincidence.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
+gmt grdsample azi.grd -Gazimuth.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
+gmt grdsample topo_ll.grd -Gheight.grd -I$xinc/$yinc -R$x0/$x1/$y0/$y1 -nb -V
 
 echo "Done"
 
