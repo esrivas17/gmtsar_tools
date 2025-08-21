@@ -39,7 +39,7 @@ SAT_look $masterPRM < lle > topo.lltn # SAT_look returns: lon, lat, elev, look_E
 # Block median / mean
 
 set incs = `m2s.csh $pix_m lle`	
-set R = `gmt gmtinfo lle -Iincs[1]`
+set R = `gmt gmtinfo lle -I$incs[2]`
 
 gmt blockmedian topo.lltn $R -I$incs[1] -i0,1,3 -r -V -Glook_E.grd
 gmt blockmedian topo.lltn $R -I$incs[1] -i0,1,4 -r -V -Glook_N.grd
