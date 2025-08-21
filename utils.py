@@ -150,11 +150,19 @@ def headingFromLED(ledfile):
         lines = f.readlines()
         lines = [x.strip() for x in lines]
     # Format for LED orbits: year, dayofYear, seconds, X, Y, Z, Vx, Vy, Vz
-    _, _, _, x1,y1,z1, _, _, _ = lines[1].split()
-    _, _, _, x2,y2,z2, _, _, _ = lines[2].split()
-    lat1, lon1, _ = conv.XYZ2GEO(float(x1),float(y1),float(z1), outdeg=True)
-    lat2, lon2, _ = conv.XYZ2GEO(float(x2),float(y2),float(z2), outdeg=True)
-    return calc_bearing(lat1, lon1, lat2, lon2)
+    lines.pop(0) # removing header
+    count = 0
+    sumbearing = 0
+    for orb1, orb2 in zip(lines[:-1], lines[1:]):
+        _, _, _, x1,y1,z1, _, _, _ = orb1.split()
+        _, _, _, x2,y2,z2, _, _, _ = orb2.split()
+        lat1, lon1, _ = conv.XYZ2GEO(float(x1),float(y1),float(z1), outdeg=True)
+        lat2, lon2, _ = conv.XYZ2GEO(float(x2),float(y2),float(z2), outdeg=True)
+        sumbearing += calc_bearing(lat1, lon1, lat2, lon2)
+        count += 1
+    
+    mean_bearing = sumbearing/count
+    return mean_bearing
 
 
 def calc_bearing(lat1, lon1, lat2, lon2):
