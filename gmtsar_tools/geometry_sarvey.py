@@ -5,7 +5,7 @@ from netCDF4 import Dataset as NetCDFFile
 import numpy as np
 import h5py as h5
 import subprocess
-from utils import headingFromLED
+from gmtsar_tools.utils import headingFromLED
 from mintpy.utils import readfile
 
 

@@ -2,7 +2,7 @@
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, run_command
+from gmtsar_tools.utils import grep, run_command
 import os
 import pdb
 

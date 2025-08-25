@@ -3,14 +3,13 @@ import os
 import argparse
 from pathlib import Path
 import glob
-from utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readOldGMTFormat, headingFromLED
+from gmtsar_tools.utils import grep, fracyear2yyyymmdd, try_command, getSlcData, readOldGMTFormat, headingFromLED
 import numpy as np
 import shutil
 import h5py as h5
 import subprocess
 from mintpy.utils import readfile
 import pdb
-
 
 def main():
     args = get_args()

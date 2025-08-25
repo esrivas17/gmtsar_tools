@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 from pathlib import Path
-from utils import grep
+from gmtsar_tools.utils import grep
 import numpy as np
 import pdb
 

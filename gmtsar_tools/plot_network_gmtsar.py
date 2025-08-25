@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from itertools import combinations
 from matplotlib.collections import LineCollection
 from datetime import datetime, date
-from utils import read_baseline_table, str2date
+from gmtsar_tools.utils import read_baseline_table, str2date
 import glob
 import pdb
 

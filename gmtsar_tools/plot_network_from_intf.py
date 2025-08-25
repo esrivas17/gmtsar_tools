@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from datetime import datetime
-from utils import read_baseline_table
+from gmtsar_tools.utils import read_baseline_table
 import glob
 import pdb
 
